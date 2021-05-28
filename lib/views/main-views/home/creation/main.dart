@@ -29,14 +29,14 @@ class CreationPage extends StatelessWidget {
             ),
             nextPage: CreateOrder(),
           ),
-          CreationItemButton(
-            title: 'Ajouter une dépense',
-            leadingIcon: Icon(
-              Icons.money,
-              color: Theme.of(context).primaryColor,
-            ),
-            nextPage: this,
-          ),
+          // CreationItemButton(
+          //   title: 'Ajouter une dépense',
+          //   leadingIcon: Icon(
+          //     Icons.money,
+          //     color: Theme.of(context).primaryColor,
+          //   ),
+          //   nextPage: this,
+          // ),
         ],
       ),
     );

@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_compta_app/constants/memory.dart';
 import 'package:my_compta_app/models/product/Product.dart';
+import 'package:my_compta_app/repositories/product/orders_repository.dart';
+
+import '../../../../models/transaction/TransactionAdapter.dart';
 
 class CreateOrder extends StatefulWidget {
   @override
@@ -19,7 +23,7 @@ class _CreateOrderState extends State<CreateOrder> {
   Widget build(BuildContext context) {
     final titleStyle = TextStyle(
       fontWeight: FontWeight.w600,
-      fontSize: 20.0,
+      fontSize: 18.0,
       color: Colors.black87,
     );
 
@@ -67,47 +71,7 @@ class _CreateOrderState extends State<CreateOrder> {
                 child: Column(
                   children: [
                     TextButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      'Vos produit:',
-                                      style:
-                                          Theme.of(context).textTheme.headline6,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: products.length,
-                                      itemBuilder: (context, index) {
-                                        Product product = products[index];
-                                        return ListTile(
-                                          onTap: () {
-                                            selectedProduct = product;
-                                            setState(() {});
-                                            Navigator.of(context).pop();
-                                          },
-                                          leading: Image.network(
-                                            product.image.pathOfImage,
-                                          ),
-                                          title: Text(product.title),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
+                      onPressed: chooseProduct,
                       child: Container(
                         padding: EdgeInsets.all(12.0),
                         width: MediaQuery.of(context).size.width,
@@ -127,9 +91,14 @@ class _CreateOrderState extends State<CreateOrder> {
                         ),
                         child: selectedProduct != null
                             ? ListTile(
-                                leading: Image.network(
-                                  selectedProduct.image.pathOfImage,
-                                ),
+                                leading: selectedProduct.image.pathOfImage
+                                        .startsWith('http')
+                                    ? Image.network(
+                                        selectedProduct.image.pathOfImage,
+                                      )
+                                    : Image.file(
+                                        File(selectedProduct.image.pathOfImage),
+                                      ),
                                 title: Text(selectedProduct.title,
                                     style: Theme.of(context).textTheme.headline6
                                     // .copyWith(color: Colors.white),
@@ -142,7 +111,8 @@ class _CreateOrderState extends State<CreateOrder> {
                                     .textTheme
                                     .headline5
                                     .copyWith(
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 22,
                                     ),
                               ),
                       ),
@@ -170,12 +140,16 @@ class _CreateOrderState extends State<CreateOrder> {
                               ),
                               controller: quantityController,
                               onFieldSubmitted: (t) {
-                                if (t.isEmpty) {
+                                if (t.isEmpty ||
+                                    int.tryParse(quantityController.text) ==
+                                        null ||
+                                    int.tryParse(quantityController.text) <=
+                                        0) {
                                   quantityController.text = '1';
-                                  setState(() {});
                                 }
+                                setState(() {});
                               },
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                             ),
                           ),
                         ],
@@ -212,8 +186,61 @@ class _CreateOrderState extends State<CreateOrder> {
     );
   }
 
+  chooseProduct() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  'Vos produit:',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    Product product = products[index];
+                    return ListTile(
+                      onTap: () {
+                        selectedProduct = product;
+                        setState(() {});
+                        Navigator.of(context).pop();
+                      },
+                      leading: product.image.pathOfImage.startsWith('http')
+                          ? Image.network(
+                              product.image.pathOfImage,
+                            )
+                          : Image.file(
+                              File(product.image.pathOfImage),
+                            ),
+                      title: Text(product.title),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   submitForm() async {
+    OrdersRepository.addOrder(
+      Transaction(
+        id: null,
+        title: selectedProduct.title,
+        createdAt: DateTime.now(),
+        amount: (selectedProduct.price * int.parse(quantityController.text)),
+        expense: true,
+      ),
+    );
     Navigator.of(context).pop();
-    //
   }
 }

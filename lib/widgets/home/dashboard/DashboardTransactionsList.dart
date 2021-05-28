@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_compta_app/models/transaction/Transaction.dart';
+import 'package:my_compta_app/repositories/product/orders_repository.dart';
 import 'package:my_compta_app/widgets/transaction/TransactionListItem.dart';
 
 class DashboardTransactionsList extends StatefulWidget {
@@ -11,71 +11,11 @@ class DashboardTransactionsList extends StatefulWidget {
 }
 
 class _DashboardTransactionsListState extends State<DashboardTransactionsList> {
-  List<Transaction> transactions = [
-    Transaction(
-      id: 1,
-      title: 'iPhone X 256gb',
-      createdAt: DateTime.now().subtract(
-        Duration(hours: 1),
-      ),
-      amount: 21000.00,
-      expense: false,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Samsung Galaxy S11 64gb',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 1, hours: 1),
-      ),
-      amount: 21000.00,
-      expense: false,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Cable USB (iPhone XS)',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 2, hours: 1),
-      ),
-      amount: 300.00,
-      expense: false,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Bouteille de viens',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 2, hours: 1),
-      ),
-      amount: 10.00,
-      expense: true,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Facture SOMELEC',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 3),
-      ),
-      amount: 3400.00,
-      expense: true,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Le loyer du boutique #2',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 3),
-      ),
-      amount: 4500.00,
-      expense: true,
-    ),
-    Transaction(
-      id: 1,
-      title: 'Le loyer du boutique #1',
-      createdAt: DateTime.now().subtract(
-        Duration(days: 3),
-      ),
-      amount: 4000.00,
-      expense: true,
-    ),
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

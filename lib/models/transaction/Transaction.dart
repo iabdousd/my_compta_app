@@ -23,4 +23,20 @@ class Transaction {
     @required this.amount,
     @required this.expense,
   });
+
+  Transaction copyWith({
+    int id,
+    String title,
+    DateTime createdAt,
+    double amount,
+    bool expense,
+  }) {
+    return Transaction(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      createdAt: createdAt ?? this.createdAt,
+      amount: amount ?? this.amount,
+      expense: expense ?? this.expense,
+    );
+  }
 }

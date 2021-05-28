@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../constants/memory.dart';
+import '../../../../models/product/Product.dart';
+import '../../../../models/media/ImageMedia.dart' as im;
+
 class CreateProduct extends StatefulWidget {
   @override
   _CreateProductState createState() => _CreateProductState();
@@ -12,12 +16,14 @@ class CreateProduct extends StatefulWidget {
 
 class _CreateProductState extends State<CreateProduct> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
   File _image;
   final picker = ImagePicker();
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -165,6 +171,7 @@ class _CreateProductState extends State<CreateProduct> {
                           labelText: 'Nom du produit:',
                           labelStyle: textFieldLabelStyle,
                         ),
+                        controller: _titleController,
                         textInputAction: TextInputAction.next,
                       ),
                     ),
@@ -183,12 +190,15 @@ class _CreateProductState extends State<CreateProduct> {
                                 if (value.isEmpty) {
                                   return 'Le prix du produit est obligatoire';
                                 }
+                                if (double.tryParse(value) == null)
+                                  return 'Le prix n\'est pas valide';
                                 return null;
                               },
                               decoration: InputDecoration(
                                 labelText: 'Prix du produit:',
                                 labelStyle: textFieldLabelStyle,
                               ),
+                              controller: _priceController,
                               keyboardType: TextInputType.number,
                             ),
                           ),
@@ -226,6 +236,24 @@ class _CreateProductState extends State<CreateProduct> {
   }
 
   submitForm() async {
-    //
+    if (!_formKey.currentState.validate()) return;
+    if (_image == null) return;
+    products.add(
+      Product(
+        id: products.length,
+        title: _titleController.text,
+        image: im.ImageMedia(
+          id: DateTime.now().millisecond,
+          createdAt: DateTime.now(),
+          ext: _image.path.split('.').last,
+          name: _image.path.split('/').last,
+          pathOfImage: _image.path,
+          lastUse: DateTime.now(),
+        ),
+        createdAt: DateTime.now(),
+        price: double.tryParse(_priceController.text),
+      ),
+    );
+    Navigator.pop(context);
   }
 }
